@@ -1,53 +1,46 @@
 package galerie.entity;
 
-import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
+import javax.persistence.*;
+import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-
+// Un exemple d'entité
+// On utilise Lombok pour auto-générer getter / setter / toString...
+// cf. https://examples.javacodegeeks.com/spring-boot-with-lombok/
 @Getter
 @Setter
 @NoArgsConstructor
 @RequiredArgsConstructor
 @ToString
-@Entity
-
+@Entity // Une entité JPA
 public class Personne {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    public Integer id;
 
-    @Column(unique = true)
     @NonNull
-    String nom;
+    public String nom;
 
     @Column(unique = true)
-    String adresse;
+    public String adresse;
 
     @OneToMany(mappedBy = "client")
-    List<Transaction> achats = new LinkedList<>();
+    @ToString.Exclude
+    public List<Transaction> achats = new LinkedList<>();
 
     public float budgetArt(int annee) {
-        float budget = 0f;
-        for (Transaction t : achats) {
-            if (t.getVenduLe().isAfter(LocalDate.of(annee, 1, 1))
-                    && t.getVenduLe().isBefore(LocalDate.of(annee, 12, 31))) {
-                budget += t.getPrixVente();
-            }
-        }
-        return budget;
+        float result = 0.0f;
+        for (Transaction achat : achats)
+            if (achat.getVenduLe().getYear() == annee)
+                result += achat.getPrixVente();
+        return result;
+        // Peut s'écrire en utilisant l'API Stream
+        // cf. https://www.baeldung.com/java-stream-filter-lambda
+        /*
+         * return achats.stream() .filter( achat -> achat.getVenduLe().getYear() ==
+         * annee) // On filtre sur l'annee .map(achat -> achat.getPrixVente()) // On
+         * garde le prix de vente .reduce(0f, Float::sum); // On additionne
+         */
     }
 }

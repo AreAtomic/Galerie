@@ -1,10 +1,10 @@
 package galerie.dao;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import galerie.entity.Personne;
+import galerie.entity.Artiste;
 
 // This will be AUTO IMPLEMENTED by Spring 
 
-public interface PersonneRepository extends JpaRepository<Personne, Integer> {
+public interface ArtisteRepository extends JpaRepository<Artiste, Integer> {
 
 }
